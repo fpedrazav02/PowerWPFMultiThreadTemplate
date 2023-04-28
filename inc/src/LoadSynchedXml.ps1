@@ -25,7 +25,8 @@ function LoadSyncXml {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory=$true)][string]$xamlpath,
-        [Parameter(Mandatory=$true)][hashtable]$hashtable
+        [Parameter(Mandatory=$true)][hashtable]$hashtable,
+        [Parameter(Mandatory=$true)][string]$xmlname
     )
     
     begin {
@@ -45,19 +46,19 @@ function LoadSyncXml {
 
         try {
             #tratar de cargar el XAML a un form de PS1
-            $Sync.Window1 = [Windows.Markup.XamlReader]::Load($reader)
+            $Sync.$xmlname = [Windows.Markup.XamlReader]::Load($reader)
         }
         catch {
             write-host $_:Exception
             throw
         }
         #Cargar en la hash table los objetos del XAML para no tener que meterte dentro de $Sync.Window1.Content.ChildeItems...
-        $name = "pruebita"
+        $name = "$($xmlname)_obj"
         $Sync.$name = @{}
         $xaml.SelectNodes("//*[@Name]") | ForEach-Object {
 
             try {
-                $Sync.$name.Add($_.Name,$Sync.Window1.FindName($_.Name))
+                $Sync.$name.Add($_.Name,$Sync.$xmlname.FindName($_.Name))
             }
             catch {
                 throw

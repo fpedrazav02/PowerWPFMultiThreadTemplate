@@ -31,5 +31,5 @@ Import-Module '.\inc' -Verbose -Force
     #Create synchornized hash table
 $Sync = [Hashtable]::Synchronized(@{})
 
-LoadSyncXml -xamlpath '.\XML\login.xaml' -hashtable $Sync
+LoadSyncXml -xamlpath '.\XML\login.xaml' -hashtable $Sync -xmlname "login"
 
