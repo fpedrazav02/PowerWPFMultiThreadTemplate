@@ -17,7 +17,7 @@
 #  DEPENDENCIAS   #
 #                 #
 ###################
-
+Add-Type -AssemblyName PresentationFramework
 Import-Module '.\inc' -Verbose -Force
 
 
@@ -27,6 +27,9 @@ Import-Module '.\inc' -Verbose -Force
 #              #
 ################
 
-# Call the function to display the prompt
-ShowPrompt
-SayHi
+# Load XAML Files and variables into a SyncHash
+    #Create synchornized hash table
+$Sync = [Hashtable]::Synchronized(@{})
+
+LoadSyncXml -xamlpath '.\XML\login.xaml' -hashtable $Sync
+
