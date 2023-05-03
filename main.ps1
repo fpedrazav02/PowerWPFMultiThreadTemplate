@@ -30,6 +30,7 @@ Import-Module '.\inc' -Verbose -Force
 # Load XAML Files and variables into a SyncHash
     #Create synchornized hash table
 $Sync = [Hashtable]::Synchronized(@{})
+$Sync.Jobs = [System.Collections.ArrayList]@()
 
 LoadSyncXml -xamlpath '.\XML\login.xaml' -hashtable $Sync -xmlname "login"
 
@@ -57,16 +58,26 @@ $iss.Variables.Add((New-Object -TypeName System.Management.Automation.Runspaces.
 
 
 <#                          RunspacePool & PowerShell                          #>
+$Runspace = [RunspaceFactory]::CreateRunspacePool(1, $env:PROCESSOR_LEVEL + 1, $iss, $Host)
+$Runspace.ApartmentState = [Threading.ApartmentState]::STA
+$Runspace.Open()
 
-$rsPool = [runspacefactory]::CreateRunspace($iss)
-$rsPool.Open()
+$Sync.login.Add_PreviewKeyDown({
+    if ($_.Key -eq 'Escape') {
+        $job = [powershell]::Create().AddScript({
 
-$powerShell = [powershell]::Create()
-$powerShell.Runspace = $rsPool
-
-[void]$powerShell.AddScript({
-    Add-Type -AssemblyName PresentationFramework
-   $Sync.login.ShowDialog()
+            $Sync.login.Dispatcher.Invoke([Action]{
+                $Sync.login.Close()
+            })
+        })
+        $job.RunspacePool = $Runspace
+        $Handle = $job.BeginInvoke()
+        $Sync.Jobs.Add([PSCustomObject]@{
+            'Session' = $job
+            'Handle' = $Handle
+        })
+    }
 })
 
-$powerShell.Invoke()
+
+$Sync.login.ShowDialog() | Out-Null
