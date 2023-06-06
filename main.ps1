@@ -4,8 +4,8 @@
 .DESCRIPTION
     Asignaremos los cuatro primeros atributos custom para poder mantener las listas de distribuciÃ³n dinÃ¡micas
 .NOTES
-    File Name      : DynamicDLAssign.ps1
-    Author         : TIC-Typsa
+    File Name      : main.ps1
+    Author         : fpedrazav02
     Prerequisite   : PowerShell V2 over Vista and upper.
 .LINK
     Script located at:
